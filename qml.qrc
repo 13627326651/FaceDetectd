@@ -1,0 +1,29 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MyImage.qml</file>
+        <file>BtnBackground.qml</file>
+        <file>FaceRectangle.qml</file>
+        <file>images/sadness.jpg</file>
+        <file>FaceImage.qml</file>
+        <file>images/anger.jpg</file>
+        <file>images/contempt.png</file>
+        <file>images/fear.png</file>
+        <file>images/happiness.png</file>
+        <file>images/neutral.png</file>
+        <file>images/surprise.png</file>
+        <file>images/back.png</file>
+        <file>images/disgust.jpg</file>
+        <file>sound/anger.wav</file>
+        <file>sound/fear.wav</file>
+        <file>sound/happiness.wav</file>
+        <file>sound/sadness.wav</file>
+        <file>sound/suprise.wav</file>
+        <file>sound/takephoto.wav</file>
+        <file>images/female.png</file>
+        <file>images/glasses.png</file>
+        <file>images/male.png</file>
+        <file>DescriptionItem.qml</file>
+        <file>MyCheckBox.qml</file>
+    </qresource>
+</RCC>
