@@ -57,15 +57,15 @@ Item{
             id: frontRect;
             anchors.fill: parent;
             border.width: 1;
-            border.color: "darkgray"
-            color: "gray"
+            border.color:Qt.rgba(0.03, 0.58, 1, 1)
+            color:  Qt.rgba(0.02, 0.85, 0.98, 1.0)
             Text{
                 anchors.centerIn: parent;
                 width: contentWidth;
                 height: contentHeight;
                 font.pointSize: 14;
                 text: "查看" + (item.currentIndex + 1 )+ "号人物"
-                color: flipArea.containsMouse ? "blue" : "black"
+                color: flipArea.containsMouse ? "blue" : "black";
             }
 
         }

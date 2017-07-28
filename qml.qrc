@@ -25,5 +25,9 @@
         <file>images/male.png</file>
         <file>DescriptionItem.qml</file>
         <file>MyCheckBox.qml</file>
+        <file>images/background.jpg</file>
+        <file>MyTabBar.qml</file>
+        <file>MyTabButton.qml</file>
+        <file>MyButton.qml</file>
     </qresource>
 </RCC>

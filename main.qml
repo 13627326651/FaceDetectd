@@ -10,7 +10,6 @@ Window {
     minimumWidth: 850;
     visible: true
     title: qsTr("人脸识别跟踪系统")
-    color: "#E4E4E4"
     property var imgList: new Array;
     property var idList: new Array;
 
@@ -118,7 +117,6 @@ Window {
         id: leftArea;
         width: parent.width * 2 / 3;
         height: parent.height - 30;
-        color: "#E4E4E4"
         Camera {
             id: camera
             imageCapture {
@@ -137,7 +135,7 @@ Window {
             anchors.left: parent.left;
             height: 40;
             width: parent.width;
-            color: "lightblue"
+            color:  Qt.rgba(0.02, 0.85, 0.98, 1.0)
             Text{
                 anchors.left: parent.left;
                 anchors.leftMargin: 10;
@@ -219,7 +217,8 @@ Window {
                 anchors.centerIn: parent;
                 width: 450;
                 height: 340;
-                color: "darkgray"
+                border.width: 1;
+                border.color: "darkgray"
                 z: 10;
                 Row{
                     anchors.centerIn: parent;
@@ -274,7 +273,7 @@ Window {
             anchors.left: parent.left;
             width: parent.width
             height: 40;
-            color: "lightblue"
+            color:  Qt.rgba(0.02, 0.85, 0.98, 1.0)
             Text{
                 anchors.left: parent.left;
                 anchors.leftMargin: 10;
@@ -295,13 +294,9 @@ Window {
             anchors.top: textBar2.bottom
             anchors.topMargin: 40
             spacing: 10;
-            Button{
+            MyButton{
                 id: bt2;
                 text: "识 别";
-                hoverEnabled: true;
-                autoRepeat: false;
-                font.pointSize: 12;
-                highlighted: true
                 onClicked: {
                     //注意要放在前面
                     myIndicator.running = true;
@@ -312,14 +307,10 @@ Window {
                 }
 
             }
-            Button{
+            MyButton{
                 id: bt3;
                 width: 80;
                 text: "匹 配";
-                hoverEnabled: true;
-                autoRepeat: false;
-                font.pointSize: 12;
-                highlighted: true
                 property bool isRunning: false;
                 property string tempImg: "";
                 onClicked: {
@@ -336,14 +327,10 @@ Window {
 
             }
 
-            Button{
+            MyButton{
                 id: bt4;
                 width: 80;
                 text: "加入列表";
-                hoverEnabled: true;
-                autoRepeat: false;
-                font.pointSize: 12;
-                highlighted: true
                 property string tempImg: "";
                 onClicked: {
                     if(photoPreview.source != ""){
@@ -358,14 +345,10 @@ Window {
 
             }
 
-            Button{
+            MyButton{
                 id: bt5;
                 width: 80;
                 text: "更新列表";
-                hoverEnabled: true;
-                autoRepeat: false;
-                font.pointSize: 12;
-                highlighted: true;
                 onClicked: {
                     control.currentIndex = 2;
                     for(var i = 0; i < imgLibrary.children.length; i++)
@@ -417,24 +400,28 @@ Window {
         anchors.left: leftArea.right;
         anchors.leftMargin: 1;
         width: parent.width - leftArea.width;
-        height: parent.height - 30;
-        header: TabBar {
+        height: parent.height - 26;
+        header:TabBar{
             id: control
             currentIndex: swipview.currentIndex;
-            background: Rectangle {
-                color: "#9CA1AE"
+            background: Rectangle{color: Qt.rgba(0.02, 0.85, 0.98, 1.0)}
+            MyTabButton{
+                index: 0;
+                text: "识 别"
+                height: control.height;
+                currentIndex: control.currentIndex
             }
-            TabButton {
-                text: qsTr("识 别")
-                font.pointSize: 12;
+            MyTabButton{
+                index: 1;
+                text: "匹 配"
+                height: control.height;
+                currentIndex: control.currentIndex
             }
-            TabButton {
-                text: qsTr("匹 配")
-                font.pointSize: 12;
-            }
-            TabButton {
-                text: qsTr("列 表")
-                font.pointSize: 12;
+            MyTabButton{
+                index: 2;
+                text: "列 表"
+                height: control.height;
+                currentIndex: control.currentIndex
             }
         }
 
@@ -454,9 +441,7 @@ Window {
             clip: true
             Page{
                 id: photoInfoPreview;
-                background: Rectangle{
-                    color: "#E4E4E4"
-                }
+
 
                 Image {
                     id: photoPreview_2;
@@ -486,22 +471,25 @@ Window {
                     visible: false;
                 }
                 footer: TabBar{
-                    TabButton{
+                    id: tabBar;
+                    MyTabButton{
                         text: "上一页"
-                        font.pointSize: 12
-                        onClicked: faceImage.showPix(-1)
+                        index: 0;
+                        currentIndex: tabBar.currentIndex;
+                        onClicked: { faceImage.showPix(-1); }
                     }
-                    TabButton{
+                    MyTabButton{
                         text: "下一页"
-                        font.pointSize: 12
-                        onClicked: faceImage.showPix(1)
+                        index: 1;
+                        currentIndex: tabBar.currentIndex;
+                        onClicked: { faceImage.showPix(1); }
                     }
                 }
 
             }
             Rectangle{
                 id: matchPreview;
-                color: "#E4E4E4"
+
                 MyImage{
                     id: photoPreview_3
                     anchors.horizontalCenter: parent.horizontalCenter;
@@ -535,11 +523,6 @@ Window {
             }
             ScrollView{
                 id: imgLibraryPreview;
-                background:
-                    Rectangle{
-                    color:"#E4E4E4"
-                }
-
                 Column{
                     id: imgLibrary;
                     x: (swipview.width - 200) / 2;
