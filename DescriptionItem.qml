@@ -14,7 +14,7 @@ Item{
                 height:contentHeight;
                 font.pointSize: 12;
                 color: "#1E1E27";
-                text: "芳龄: "
+                text: "年龄: "
                 anchors.verticalCenter: parent.verticalCenter;
             }
             Text{
@@ -47,6 +47,7 @@ Item{
 
             Image{
                 source: "images/male.png"
+                rotation: 180;
 
             }
             MyCheckBox{

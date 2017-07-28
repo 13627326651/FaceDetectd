@@ -24,21 +24,35 @@ Window {
             case 1:
             {        //detect
                 var persons = msg.split('\n')
+                //查找相似
                 if(bt3.isRunning)
                 {
                     fd.source = persons[0].split(',')[0];
                     fd.start(4);
                     break;
                 }
+
+                //清除以前的脸部矩形
+                for(var i = 0; i < photoPreview_2.children.length; i++)
+                    photoPreview_2.children[i].destroy();
+
+                //添加新脸部矩形
                 for(var i = 0; i < persons.length; i++)
                 {
                     var pL = persons[i].split(',')
                     var com = Qt.createComponent("FaceRectangle.qml")
+                    if(com.status == Component.Error)
+                        console.log(com.errorString())
+
                     var o = com.createObject(photoPreview_2)
                     o.updateFaceRect(pL[6].split(':'), i)
                 }
+
                 faceImage.faces = persons;
-                faceImage.showPix(0)
+                faceImage.currentIndex = 0;
+                if(persons.length > 0)
+                    faceImage.showPix(0)
+
                 myIndicator.running = false;
                 statusArea.msg = "Detecte success"
                 break;
@@ -452,9 +466,15 @@ Window {
                     width: 200;
                     height: 150;
                     onSourceChanged: {
+                        //清除子item
                         for(var i = 0; i < photoPreview_2.children.length; i++)
                             photoPreview_2.children[i].destroy();
-                        console.log("faceimage.visible = false")
+                    }
+                    function updateFlag(index)
+                    {
+                        for(var i = 0; i < children.length; i++)
+                            children[i].isChoosed = false;
+                        children[index].isChoosed = true;
 
                     }
                 }
