@@ -80,64 +80,9 @@ void RequestManager::readData(QObject *reply)
             return;
         }
     }
-
+    qDebug() << data;
     //数据处理
     switch (rWay) {
-    case Detecte:
-    {
-        FaceDataModel model;
-        if(model.fromJsonData(data))
-            emit dataReady(rWay, model.format());
-        else
-            emit dataReady(-1, "Can not find a face.");
-        break;
-    }
-    case AddFaceToList:
-    {
-        if(doc.isObject())
-        {
-            QJsonObject obj = doc.object();
-            if(obj.contains("persistedFaceId"))
-            {
-                emit dataReady(rWay,obj.value("persistedFaceId").toString());
-                break;
-            }
-        }else{
-            emit dataReady(-1, "Add face to list error");
-        }
-        break;
-    }
-    case FindSimilars:
-    {
-        QStringList similars;
-        if(doc.isArray()){
-            QJsonArray arr = doc.array();
-            for(int i = 0; i < arr.size(); i++)
-            {
-                QJsonObject obj = arr[i].toObject();
-                QString persistedFaceId = obj.value(QLatin1Literal("persistedFaceId")).toString();
-                QString confidence = QString::number(obj.value(QLatin1Literal("confidence")).toDouble());
-                similars << QString("%1,%2").arg(persistedFaceId).arg(confidence);
-            }
-        }
-        if(similars.size() > 0)
-            emit dataReady(FindSimilars, similars.join(QChar('\n')));
-        else
-            emit dataReady(-1 , "NO similar face found");
-        break;
-
-//        for(int i = 0; i < doc.array().size(); i++){
-//            QJsonObject obj = doc.array().at(i).toObject();
-//            QString persistedFaceId = obj.value(QLatin1Literal("persistedFaceId")).toString();
-//            QString confidence = QString::number(obj.value(QLatin1Literal("confidence")).toDouble());
-//            similars << QString("%1,%2").arg(persistedFaceId).arg(confidence);
-//        }
-//        if(similars.size() > 0)
-//            emit dataReady(FindSimilars, similars.join(QChar('\n')));
-//        else
-//            emit dataReady(-1 , "NO similar face found");
-//        break;
-    }
     case CreateFaceList:
         emit dataReady(rWay, "Create face list success");
         break;
@@ -145,6 +90,7 @@ void RequestManager::readData(QObject *reply)
         emit dataReady(rWay, "Delete face list success");
         break;
     default:
+        emit dataReady(rWay, data);
         break;
     }
 }
@@ -172,12 +118,12 @@ void RequestManager::request(RequestWay way, const QString &data)
             m_rWay = Detecte;
             rd.requestType = "detect";
             rd.paraList["returnFaceId"] = "true";
-            rd.paraList["returnFaceLandmarks"] = "false";
+            rd.paraList["returnFaceLandmarks"] = "true";
             //属性可以是：
             //age, gender, headPose, smile, facialHair,
             //glasses, emotion, hair, makeup, occlusion,
             //accessories, blur, exposure, noise
-            rd.paraList["returnFaceAttributes"] = "age,gender,glasses,smile,emotion";
+            rd.paraList["returnFaceAttributes"] = "age,gender,glasses,smile,emotion,makeup";
             rd.method = RequestData::Post;
             rd.contentType = "application/octet-stream";
             rd.requestBody = file.readAll();

@@ -3,8 +3,15 @@ import QtQuick 2.0
 Item{
     id: item;
     property string pixName: "";
-    property var faces: new Array();
+    property var faces;
     property int currentIndex: 0;
+
+    function init(faces)
+    {
+        currentIndex = 0;
+        item.faces = faces;
+        showPix(0);
+    }
 
     function showPix(offset)
     {
@@ -12,13 +19,25 @@ Item{
         {
             currentIndex = (currentIndex + offset + faces.length) % faces.length
 
-            var infos = faces[currentIndex].split(',')
-            pixName = "images/" + infos[5]
-            descriptionText.age = infos[1]
-            descriptionText.gender = infos[2]
-            descriptionText.glasses = infos[4]
+            var faceAttributes = faces[currentIndex].faceAttributes;
+            var max = 0;
+            var myEmotion;
+            for(var emotion in faceAttributes.emotion)
+            {
+                if(faceAttributes.emotion[emotion] > max)
+                {
+                    max = faceAttributes.emotion[emotion]
+                    myEmotion = emotion;
+                }
+            }
+            pixName = "images/" + myEmotion + ".png";
+            descriptionText.age = faceAttributes.age;
+            descriptionText.gender = faceAttributes.gender;
+            descriptionText.glasses = faceAttributes.glasses;
+            descriptionText.eyemakeup = faceAttributes.makeup.eyeMakeup;
+            descriptionText.lipmakeup = faceAttributes.makeup.lipMakeup;
 
-            photoPreview_2.updateFlag(currentIndex);
+            photoPreview.currentIndex = currentIndex;
 
             flipable.flipped = false;
             item.visible = true;
@@ -57,8 +76,8 @@ Item{
             id: frontRect;
             anchors.fill: parent;
             border.width: 1;
-            border.color:Qt.rgba(0.03, 0.58, 1, 1)
-            color:  Qt.rgba(0.02, 0.85, 0.98, 1.0)
+            border.color: "darkgray"
+            color:  "#CCC3EE"
             Text{
                 anchors.centerIn: parent;
                 width: contentWidth;
@@ -107,7 +126,7 @@ Item{
          console.log(flipable.flipped, flipable.running)//false false, true false, true true, true false
 //                switch(pixName)
 //                {
-//                case "images/anger.jpg":
+//                case "images/anger2.png":
 //                    player.source = "sound/anger.wav"
 //                    player.play();
 //                    break;
@@ -119,7 +138,7 @@ Item{
 //                    player.source = "sound/happiness.wav"
 //                    player.play();
 //                    break;
-//                case "images/sadness.jpg":
+//                case "images/sadness.png":
 //                    player.source = "sound/sadness.wav"
 //                    player.play();
 //                    break;

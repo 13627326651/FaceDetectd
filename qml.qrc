@@ -4,9 +4,7 @@
         <file>MyImage.qml</file>
         <file>BtnBackground.qml</file>
         <file>FaceRectangle.qml</file>
-        <file>images/sadness.jpg</file>
         <file>FaceImage.qml</file>
-        <file>images/anger.jpg</file>
         <file>images/contempt.png</file>
         <file>images/fear.png</file>
         <file>images/happiness.png</file>
@@ -29,5 +27,12 @@
         <file>MyTabBar.qml</file>
         <file>MyTabButton.qml</file>
         <file>MyButton.qml</file>
+        <file>MyProgressBar.qml</file>
+        <file>images/anger2.png</file>
+        <file>images/sadness.png</file>
+        <file>FaceLandmarks.qml</file>
+        <file>ComCreation.js</file>
+        <file>images/eyemakeup.png</file>
+        <file>images/lipmakeup.png</file>
     </qresource>
 </RCC>

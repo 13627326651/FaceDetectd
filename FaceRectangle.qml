@@ -1,33 +1,39 @@
 import QtQuick 2.0
 
 Item{
-    id:faceRectangle;
+    id:faceRectangleItem;
     z: 10;
-    property real wRation: 200 / parent.sourceSize.width;
-    property real hRation: 150 / parent.sourceSize.height;
     property color borderColor: Qt.rgba(Math.random(), Math.random(), Math.random());
-    property bool isChoosed: false;
+    property int index: 0;
+    property int currentIndex: parent.currentIndex;
+    onCurrentIndexChanged: {
+        if(faceRectangleItem.currentIndex == -1){
+            console.log("facerectangle destroy....")
+            faceRectangleItem.destroy();
+        }
+    }
 
-    function updateFaceRect(frect, i)
+    function updateFaceRect(faceRectangle, i)
     {
-        x = Math.round(wRation * frect[0])
-        y = Math.round(hRation * frect[1]) - canvas.height;
-        width = Math.round(wRation * frect[2])
-        height = Math.round(hRation * frect[3]) + canvas.height
+        x = Math.round(parent.wRation * faceRectangle.left)
+        y = Math.round(parent.hRation * faceRectangle.top) - canvas.height;
+        width = Math.round(parent.wRation * faceRectangle.width)
+        height = Math.round(parent.hRation * faceRectangle.height) + canvas.height
         faceText.text = i + 1;
     }
+
 
     Canvas{
         id: canvas;
         width: parent.width;
-        height: 30;
+        height: 50;
         anchors.bottom: faceRect.top;
         anchors.left: parent.left;
-        visible: parent.isChoosed;
+        visible: parent.index == parent.currentIndex;
         antialiasing: true;
 
-        property var borderLength: width / 2;
-        property var spacing: 10;
+        property var borderLength: 30;
+        property var spacing: 20;
 
         onPaint: {
             var ctx = getContext("2d");
@@ -58,10 +64,10 @@ Item{
         Text{
             id: faceText;
             anchors.centerIn: parent;
-            color: faceRectangle.borderColor
+            color: faceRectangleItem.borderColor
             width: contentWidth;
             height: contentHeight;
-            font.pointSize: 12;
+            font.pointSize: 20;
         }
     }
 }

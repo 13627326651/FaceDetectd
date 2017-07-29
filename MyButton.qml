@@ -8,7 +8,7 @@ Button{
     autoRepeat: false;
     contentItem: Text{
         height: button.height;
-        color: Qt.rgba(1, 1, 1, 1);
+        color: "#353637"
         horizontalAlignment: Text.AlignHCenter;
         verticalAlignment: Text.AlignVCenter;
         font.pointSize: 15;
@@ -17,8 +17,8 @@ Button{
 
     background: Rectangle{
         height: button.height;
-        color:  button.down ?  Qt.rgba(0.03, 0.58, 1, 1) : Qt.rgba(0.02, 0.85, 0.98, 1.0);
+        color:  button.down ?  "#D0C2EF" : "#F9E5E6";
         border.width: 1;
-        border.color: Qt.rgba(0.03, 0.58, 1, 1);
+        border.color: "darkgray";
     }
 }

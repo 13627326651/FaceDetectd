@@ -85,7 +85,7 @@ QString FaceDataModel::getOneRecord(const QJsonObject &jsonObj)
         obj = obj.value(QLatin1Literal("emotion")).toObject();
         QMap<double, QString> emotions;
         if(obj.contains("anger"))
-            emotions.insert(obj.value("anger").toDouble(), "anger.jpg");
+            emotions.insert(obj.value("anger").toDouble(), "anger2.png");
         if(obj.contains("contempt"))
             emotions.insert(obj.value("contempt").toDouble(), "contempt.png");
         if(obj.contains("disgust"))

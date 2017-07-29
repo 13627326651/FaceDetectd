@@ -1,4 +1,4 @@
-import QtQuick 2.6
+import QtQuick 2.7
 import QtQuick.Window 2.2
 import QtMultimedia 5.9
 import QtQuick.Controls 2.2
@@ -13,82 +13,96 @@ Window {
     property var imgList: new Array;
     property var idList: new Array;
 
+    Image {
+        id: background
+        anchors.fill: parent;
+        source: "images/background.jpg"
+        fillMode: Image.Stretch;
+    }
+
     FaceDetecte{
         id: fd;
         onReadyRead: {
             // 如果是跟踪功能，进行判断
-
             switch(flag)
             {
             case 1:
             {        //detect
-                var persons = msg.split('\n')
-                //查找相似
-                if(bt3.isRunning)
+
+                var array = JSON.parse(msg);
+                if(array.length > 0){
+                    //查找相似
+                    if(bt3.isRunning)
+                    {
+                        fd.source = array[0].faceId;
+                        fd.start(4);
+                        break;
+                    }
+
+                    //清除以前的脸部矩形
+                    photoPreview.currentIndex = -1;
+                    photoPreview.currentIndex = 0;
+                    for(var i = 0; i < array.length; i++)
+                    {
+                        var com = Qt.createComponent("FaceRectangle.qml")
+                        if(com.status == Component.Error)
+                            console.log(com.errorString())
+
+                        var o = com.createObject(photoPreview)
+                        o.updateFaceRect(array[i].faceRectangle, i)
+                        o.index = i;
+                    }
+
+                    faceLandmarks.marks =  array[0].faceLandmarks;
+                    faceLandmarks.requestPaint();
+                    faceImage.init(array)
+                    statusArea.msg = "Detecte success"
+                }else
                 {
-                    fd.source = persons[0].split(',')[0];
-                    fd.start(4);
-                    break;
+                    statusArea.msg = "No face found"
                 }
-
-                //清除以前的脸部矩形
-                for(var i = 0; i < photoPreview_2.children.length; i++)
-                    photoPreview_2.children[i].destroy();
-
-                //添加新脸部矩形
-                for(var i = 0; i < persons.length; i++)
-                {
-                    var pL = persons[i].split(',')
-                    var com = Qt.createComponent("FaceRectangle.qml")
-                    if(com.status == Component.Error)
-                        console.log(com.errorString())
-
-                    var o = com.createObject(photoPreview_2)
-                    o.updateFaceRect(pL[6].split(':'), i)
-                }
-
-                faceImage.faces = persons;
-                faceImage.currentIndex = 0;
-                if(persons.length > 0)
-                    faceImage.showPix(0)
 
                 myIndicator.running = false;
-                statusArea.msg = "Detecte success"
                 break;
             }
             case 3:         //Addfacetolist
             {
                 //入库时备份了一份路径到bt4.tempImg;
+                var obj = JSON.parse(msg);
                 imgList[imgList.length] = bt4.tempImg;
-                idList[idList.length] = msg;
+                idList[idList.length] = obj.persistedFaceId;
+                //console.log("msg", persistedFaceId, persistedFaceId.persistedFaceId);
+
                 statusArea.msg = "Add face to list success"
                 myIndicator.running = false;
                 break;
             }
             case 4:
             {    //Find a similar
-                var faces = msg.split('\n');
-                var max = -1;
-                var faceId;
-                for(var i = 0; i < faces.length;  i++)
+
+                var array = JSON.parse(msg)
+                var max = 0;
+                var persistedFaceId;
+                for(var i = 0; i < array.length; i++)
                 {
-                    var con = faces[i].split(',')[1];
-                    if(con > max){
-                        max = con;
-                        faceId = faces[i].split(',')[0];
+                    if(array[i].confidence > max)
+                    {
+                        max = array[i].confidence;
+                        persistedFaceId = array[i].persistedFaceId;
                     }
                 }
 
                 for(var i = 0; i < idList.length; i++)
                 {
-                    if(idList[i] == faceId)
+                    if(idList[i] == persistedFaceId)
                     {
                         statusArea.msg = "Find similar face success"
                         matchedImg.source = imgList[i];
-                        confidence.myText = Math.round(max* 10000)/100;
+                        confidence.value = max;
                         break;
                     }
                 }
+
                 //可能从服务器找到了匹配的faceid，但是数组中没有找到相同的faceid
                 if(i == idList.length)
                     statusArea.msg = "No similar face found"
@@ -117,6 +131,7 @@ Window {
         id: leftArea;
         width: parent.width * 2 / 3;
         height: parent.height - 30;
+        color: "transparent"
         Camera {
             id: camera
             imageCapture {
@@ -135,7 +150,8 @@ Window {
             anchors.left: parent.left;
             height: 40;
             width: parent.width;
-            color:  Qt.rgba(0.02, 0.85, 0.98, 1.0)
+            border.color:  "darkgray"
+            color: "transparent"
             Text{
                 anchors.left: parent.left;
                 anchors.leftMargin: 10;
@@ -152,8 +168,6 @@ Window {
         Image{
             id: back
             anchors.verticalCenter: output.verticalCenter;
-            //            anchors.right: output.left;
-            //            anchors.rightMargin: 4;
             x: (output.x - back.width) / 2
             width: 40;
             height: 40;
@@ -164,6 +178,8 @@ Window {
                 anchors.fill: parent;
                 onClicked: {
                     optionsRect.visible = true;
+                    photoPreview.source = ""
+                    photoPreview.path = ""
                 }
             }
         }
@@ -177,14 +193,40 @@ Window {
             height: 400;
             source: camera
             focus : visible // to receive focus and capture key events when visible
+
             Image {
                 id: photoPreview
                 width: 450;
                 height: 340;
-                fillMode: Image.PreserveAspectFit;
+                fillMode: Image.Stretch;
                 anchors.centerIn: parent;
                 property string path: "";
                 property bool fromLocal: false
+                property real wRation: width / sourceSize.width;
+                property real hRation: height / sourceSize.height;
+                property int currentIndex: 0;
+
+                Canvas{
+                    id: faceLandmarks;
+                    anchors.fill: parent;
+                    property var marks;
+                    onPaint: {
+                        faceLandmarks.visible = true;
+
+                        var ctx = getContext("2d")
+                        ctx.clearRect(x, y, width, height)
+                        for(var obj in faceLandmarks.marks)
+                        {
+                            var destX = marks[obj].x * parent.wRation;
+                            var destY = marks[obj].y * parent.hRation;
+                            ctx.fillStyle = "red"
+                            ctx.beginPath();
+                            ctx.arc(destX, destY, 2.5, 0, 360)
+                            ctx.closePath()
+                            ctx.fill();
+                        }
+                    }
+                }
                 MouseArea{
                     id: mouseArea0;
                     enabled: !optionsRect.visible && !photoPreview.fromLocal;
@@ -198,6 +240,15 @@ Window {
                         camera.imageCapture.capture();
                     }
                 }
+                onSourceChanged: {
+                    //隐藏canvas
+                    faceLandmarks.visible = false;
+                    //清除子item
+                    photoPreview.currentIndex = -1;
+                }
+
+
+
             }
 
             FileDialog{
@@ -208,17 +259,17 @@ Window {
                     photoPreview.path = file;
                     photoPreview.fromLocal = true;
                     optionsRect.visible = false;
-
                 }
             }
 
-            Rectangle{
+            Image{
                 id: optionsRect;
                 anchors.centerIn: parent;
                 width: 450;
                 height: 340;
-                border.width: 1;
-                border.color: "darkgray"
+                source: "images/background.jpg"
+                //                border.width: 1;
+                //                border.color: "darkgray"
                 z: 10;
                 Row{
                     anchors.centerIn: parent;
@@ -273,7 +324,8 @@ Window {
             anchors.left: parent.left;
             width: parent.width
             height: 40;
-            color:  Qt.rgba(0.02, 0.85, 0.98, 1.0)
+            border.color:  "darkgray"
+            color: "transparent"
             Text{
                 anchors.left: parent.left;
                 anchors.leftMargin: 10;
@@ -300,7 +352,7 @@ Window {
                 onClicked: {
                     //注意要放在前面
                     myIndicator.running = true;
-                    photoPreview_2.source = photoPreview.source;
+                    //photoPreview_2.source = photoPreview.source;
                     control.currentIndex = 0;
                     fd.source = photoPreview.path;
                     fd.start(1);    //detecte
@@ -400,7 +452,10 @@ Window {
         anchors.left: leftArea.right;
         anchors.leftMargin: 1;
         width: parent.width - leftArea.width;
-        height: parent.height - 26;
+        height: parent.height - 30;
+        background: Rectangle{
+            color: "transparent"
+        }
         header:TabBar{
             id: control
             currentIndex: swipview.currentIndex;
@@ -432,41 +487,45 @@ Window {
             z:10;
         }
 
-
         SwipeView {
             id: swipview;
             anchors.fill: parent;
             width: parent.width;
             currentIndex: control.currentIndex;
             clip: true
+            background: Rectangle{
+                color: "transparent"
+            }
+
             Page{
                 id: photoInfoPreview;
 
+                background: Rectangle{ color: "transparent"}
+                //                Image {
+                //                    id: photoPreview_2;
+                //                    anchors.horizontalCenter: parent.horizontalCenter;
+                //                    anchors.top: parent.top;
+                //                    anchors.topMargin: 10;
+                //                    width: 200;
+                //                    height: 150;
+                //                    onSourceChanged: {
+                //                        //清除子item
+                //                        for(var i = 0; i < photoPreview_2.children.length; i++)
+                //                            photoPreview_2.children[i].destroy();
+                //                    }
+                //                    function updateFlag(index)
+                //                    {
+                //                        for(var i = 0; i < children.length; i++)
+                //                            children[i].isChoosed = false;
+                //                        children[index].isChoosed = true;
 
-                Image {
-                    id: photoPreview_2;
-                    anchors.horizontalCenter: parent.horizontalCenter;
-                    anchors.top: parent.top;
-                    anchors.topMargin: 10;
-                    width: 200;
-                    height: 150;
-                    onSourceChanged: {
-                        //清除子item
-                        for(var i = 0; i < photoPreview_2.children.length; i++)
-                            photoPreview_2.children[i].destroy();
-                    }
-                    function updateFlag(index)
-                    {
-                        for(var i = 0; i < children.length; i++)
-                            children[i].isChoosed = false;
-                        children[index].isChoosed = true;
-
-                    }
-                }
+                //                    }
+                //                }
                 FaceImage{
                     id: faceImage;
                     anchors.horizontalCenter: parent.horizontalCenter;
-                    anchors.top: photoPreview_2.bottom;
+                    //anchors.top: photoPreview_2.bottom;
+                    anchors.top: parent.top;
                     anchors.topMargin: 30;
                     visible: false;
                 }
@@ -476,20 +535,23 @@ Window {
                         text: "上一页"
                         index: 0;
                         currentIndex: tabBar.currentIndex;
+                        height: tabBar.height;
                         onClicked: { faceImage.showPix(-1); }
                     }
                     MyTabButton{
                         text: "下一页"
                         index: 1;
+                        height: tabBar.height;
                         currentIndex: tabBar.currentIndex;
                         onClicked: { faceImage.showPix(1); }
                     }
                 }
 
             }
+
             Rectangle{
                 id: matchPreview;
-
+                color: "transparent"
                 MyImage{
                     id: photoPreview_3
                     anchors.horizontalCenter: parent.horizontalCenter;
@@ -505,24 +567,22 @@ Window {
                     anchors.topMargin: 10;
                     text:  "匹配图"
                 }
-                Text{
+                MyProgressBar{
                     id: confidence;
                     anchors.horizontalCenter: parent.horizontalCenter;
                     anchors.top: matchedImg.bottom;
                     anchors.topMargin: 50;
-                    width: parent.width;
-                    height: 50;
-                    font.pointSize: 18;
-                    font.bold: true;
-                    color:"#1E1E27"
-                    horizontalAlignment: Text.AlignHCenter;
-                    verticalAlignment: Text.AlignVCenter;
-                    property string myText;
-                    text: matchedImg.source == "" ? "" : "相似度: " + myText + "%";
+                    width: parent.width - 60;
+                    height: 30;
+                    visible: matchedImg.source != ""
                 }
             }
+
             ScrollView{
                 id: imgLibraryPreview;
+                background: Rectangle{
+                    color: "transparent"
+                }
                 Column{
                     id: imgLibrary;
                     x: (swipview.width - 200) / 2;
