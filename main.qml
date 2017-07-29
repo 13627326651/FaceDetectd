@@ -10,6 +10,7 @@ Window {
     minimumWidth: 850;
     visible: true
     title: qsTr("人脸识别跟踪系统")
+    //flags: Qt.FramelessWindowHint
     property var imgList: new Array;
     property var idList: new Array;
 

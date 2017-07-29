@@ -37,3 +37,11 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+
+unix:{
+DISTFILES   += appicon.rc    # 就是前面说的文本文件
+}
+
+win32:{
+RC_FILE     += appicon.rc
+}

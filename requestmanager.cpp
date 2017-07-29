@@ -123,7 +123,7 @@ void RequestManager::request(RequestWay way, const QString &data)
             //age, gender, headPose, smile, facialHair,
             //glasses, emotion, hair, makeup, occlusion,
             //accessories, blur, exposure, noise
-            rd.paraList["returnFaceAttributes"] = "age,gender,glasses,smile,emotion,makeup";
+            rd.paraList["returnFaceAttributes"] = "age,gender,glasses,emotion,makeup,occlusion";
             rd.method = RequestData::Post;
             rd.contentType = "application/octet-stream";
             rd.requestBody = file.readAll();

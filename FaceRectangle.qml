@@ -16,47 +16,57 @@ Item{
     function updateFaceRect(faceRectangle, i)
     {
         x = Math.round(parent.wRation * faceRectangle.left)
-        y = Math.round(parent.hRation * faceRectangle.top) - canvas.height;
+        y = Math.round(parent.hRation * faceRectangle.top) - facePos.height;
         width = Math.round(parent.wRation * faceRectangle.width)
-        height = Math.round(parent.hRation * faceRectangle.height) + canvas.height
+        height = Math.round(parent.hRation * faceRectangle.height) + facePos.height
         faceText.text = i + 1;
     }
 
 
-    Canvas{
-        id: canvas;
-        width: parent.width;
-        height: 50;
-        anchors.bottom: faceRect.top;
-        anchors.left: parent.left;
+    Image {
+        id: facePos
+        source: "images/faceposition.png"
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.top: parent.top;
+        height: 70;
+        width: 30;
+        fillMode: Image.PreserveAspectFit;
         visible: parent.index == parent.currentIndex;
-        antialiasing: true;
-
-        property var borderLength: 30;
-        property var spacing: 20;
-
-        onPaint: {
-            var ctx = getContext("2d");
-            ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = Qt.rgba(0, 0, 1, 1);
-            ctx.beginPath();
-            ctx.moveTo( (parent.width - borderLength) / 2, 2);
-            ctx.lineTo( (parent.width - borderLength) / 2 + borderLength, 2);
-            ctx.lineTo( parent.width / 2, height - spacing);
-            ctx.lineTo( (parent.width - borderLength) / 2, 2);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
     }
+//    Canvas{
+//        id: facePos;
+//        width: parent.width;
+//        height: 50;
+//        anchors.bottom: faceRect.top;
+//        anchors.left: parent.left;
+//        visible: parent.index == parent.currentIndex;
+//        antialiasing: true;
+
+//        property var borderLength: 30;
+//        property var spacing: 20;
+
+//        onPaint: {
+//            var ctx = getContext("2d");
+//            ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
+//            ctx.lineWidth = 1;
+//            ctx.strokeStyle = Qt.rgba(0, 0, 1, 1);
+//            ctx.beginPath();
+//            ctx.moveTo( (parent.width - borderLength) / 2, 2);
+//            ctx.lineTo( (parent.width - borderLength) / 2 + borderLength, 2);
+//            ctx.lineTo( parent.width / 2, height - spacing);
+//            ctx.lineTo( (parent.width - borderLength) / 2, 2);
+//            ctx.closePath();
+//            ctx.fill();
+//            ctx.stroke();
+//        }
+//    }
 
     Item{
         id: faceRect;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         width: parent.width;
-        height: parent.height - canvas.height;
+        height: parent.height - facePos.height;
         Rectangle{x:0; y:0; width:parent.width; height:2; color:borderColor;}
         Rectangle{x:0; y:parent.height-2; width:parent.width; height:2; color:borderColor;}
         Rectangle{x:0; y:0; width: 2; height: parent.height; color: borderColor}

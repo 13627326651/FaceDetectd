@@ -1,29 +1,36 @@
-import QtQuick 2.6
-import QtQuick.Controls 2.2
 
+import QtQuick 2.6;
+Item{
+    width:200;
+    height:190;
+    property string source;
+    property string text;
+    Image{
+        id: img;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.top: parent.top;
+        width: parent.width;
+        height: 150;
+        //source: parent.source;
+        source: "images/fear.png"
+        MouseArea{
+            onClicked: {
 
-Canvas{
-    id: canvas;
-    anchors.fill: parent;
-    property var faceLandmarks;
-
-    function paint(faceLandmarks , ctx){
-        for(var obj in faceLandmarks)
-        {
-            var destX = faceLandmarks[obj].x * parent.wRation;
-            var destY = faceLandmarks[obj].y * parent.hRation;
-            console.log(destX, destY)
-
-            ctx.fillStyle = "red"
-            ctx.beginPath();
-            ctx.arc(destX, destY, 5, 0, 360)
-            ctx.closePath()
-            ctx.fill();
+            }
         }
     }
-
-    onPaint: {
-        var ctx = getContext("2d")
-        canvas.paint(canvas.faceLandmarks, ctx);
+    Text{
+        anchors.horizontalCenter: img.horizontalCenter;
+        anchors.top: img.bottom;
+        anchors.bottomMargin: 10;
+        width:parent.width;
+        height: 30;
+        horizontalAlignment: Text.AlignHCenter;
+        verticalAlignment: Text.AlignBottom;
+        font.pointSize: 14;
+        color: "#353637"
+        clip:true;
+        elide:Text.ElideRight;
+        text: img.source == "" ? "" : parent.text;
     }
 }

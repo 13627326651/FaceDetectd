@@ -34,5 +34,6 @@
         <file>ComCreation.js</file>
         <file>images/eyemakeup.png</file>
         <file>images/lipmakeup.png</file>
+        <file>images/faceposition.png</file>
     </qresource>
 </RCC>

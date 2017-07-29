@@ -9,7 +9,7 @@ ProgressBar {
      background: Rectangle {
          implicitWidth: 200
          implicitHeight: 20
-         color: "#EEEEEE"
+         color: "#FCD1E4"
          radius: 3
      }
 
@@ -27,6 +27,7 @@ ProgressBar {
                  height: contentHeight;
                  font.pointSize: 12;
                  font.bold: true;
+                 color: "#353637"
                  text: "相似度：" + Math.round(control.value * 10000) / 100 + "%"
              }
          }
